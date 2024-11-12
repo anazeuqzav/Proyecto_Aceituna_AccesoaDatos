@@ -17,8 +17,13 @@ public class Trabajador {
 
     }
 
-    // Constructor sin lista
-
+    // Constructor sin lista sin id
+    public Trabajador(String nombre, int edad, String puesto, double salario) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.puesto = puesto;
+        this.salario = salario;
+    }
     public Trabajador(int id, String nombre, int edad, String puesto, double salario) {
         this.id = id;
         this.nombre = nombre;

@@ -16,14 +16,15 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
     private static final String FIND_ONE_QUERY = "SELECT * FROM trabajador WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM trabajador";
     private static final String FIND_BY_CUADRILLA = "SELECT t.id, t.nombre, t.edad, t.puesto, t.salario FROM trabajador t " +
-                                                    "INNER JOIN cuadrilla_trabajador ct ON t.id = ct.trabajador_id" +
-                                                    "WHERE ct.cuadrilla_id = ?";
+            "INNER JOIN cuadrilla_trabajador ct ON t.id = ct.trabajador_id" +
+            "WHERE ct.cuadrilla_id = ?";
     private static final String UPDATE_QUERY = "UPDATE trabajador SET nombre = ?, edad = ?, puesto = ?, salario = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM trabajador WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM trabajador";
 
     /**
-     * Método para guardar un cliente en la tabla trabajador de la bases de datos aceituna_db.
+     * Método para guardar un trabajador en la tabla trabajador de la bases de datos aceituna_db.
+     *
      * @param trabajador el objeto Trabajador para guardar
      * @return el objeto Trabajador guardaro
      * @throws DaoException
@@ -59,6 +60,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
 
     /**
      * Método para buscar un trabajador por medio de un id en la tabla trabajador de la base de datos aceituna_db
+     *
      * @param id identificador del trabajador a buscar en la tabla
      * @return objeto Trabajador Encontrado
      * @throws DaoException
@@ -83,6 +85,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
 
     /**
      * Método para buscar todos los trabajadores
+     *
      * @return Lista de trabajadores
      * @throws DaoException
      */
@@ -105,6 +108,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
 
     /**
      * Método para buscar un trabajador por su cuadrilla
+     *
      * @param idCuadrilla identificador de la cuadrilla
      * @return devuelve la lista de trabajadores que trabajan en esa cuadrilla
      * @throws DaoException
@@ -115,8 +119,8 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
 
         try (Connection connection = FactoriaConexion.getConnection();
              PreparedStatement stmt = connection.prepareStatement(FIND_BY_CUADRILLA)) {
-             stmt.setInt(1, idCuadrilla);
-             ResultSet rs = stmt.executeQuery();
+            stmt.setInt(1, idCuadrilla);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 Trabajador trabajador = new Trabajador(
@@ -185,6 +189,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
 
     /**
      * Contar número de trabajadores que hay en la tabla
+     *
      * @return el número de trabajadores que hay en la tabla
      * @throws DaoException
      */
@@ -203,13 +208,13 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
         return 0;
     }
 
-private Trabajador mapResultSetToTrabajador(ResultSet resultSet) throws SQLException {
-    Trabajador trabajador = new Trabajador();
-    trabajador.setId(resultSet.getInt("id"));
-    trabajador.setNombre(resultSet.getString("nombre"));
-    trabajador.setEdad(resultSet.getInt("edad"));
-    trabajador.setPuesto(resultSet.getString("puesto"));
+    private Trabajador mapResultSetToTrabajador(ResultSet resultSet) throws SQLException {
+        Trabajador trabajador = new Trabajador();
+        trabajador.setId(resultSet.getInt("id"));
+        trabajador.setNombre(resultSet.getString("nombre"));
+        trabajador.setEdad(resultSet.getInt("edad"));
+        trabajador.setPuesto(resultSet.getString("puesto"));
 
-    return trabajador;
-}
+        return trabajador;
+    }
 }

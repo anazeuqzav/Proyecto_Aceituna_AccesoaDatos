@@ -14,6 +14,18 @@ public class Cuadrilla {
     public Cuadrilla() {
     }
 
+    //Constructor sin listas sin id
+    public Cuadrilla(String nombre, int supervisor_id) {
+        this.nombre = nombre;
+        this.supervisor_id = supervisor_id;
+    }
+
+    public Cuadrilla(int id, String nombre, int supervisor_id) {
+        this.id=id;
+        this.nombre = nombre;
+        this.supervisor_id = supervisor_id;
+    }
+
     public Cuadrilla(int id, String nombre, int supervisor_id, List<Trabajador> trabajadores, List<Olivar> olivares) {
         this.id = id;
         this.nombre = nombre;

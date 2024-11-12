@@ -4,16 +4,26 @@ import java.util.List;
 
 public class Olivar {
     // Atributos
-    private double hectareas;
     private int id;
-    private double produccionAnual;
     private String ubicacion;
+    private double hectareas;
+    private double produccionAnual;
+
     private List<Cuadrilla> cuadrillas;
 
     // Constructores
     public Olivar() {
 
     }
+    //Constructor sin listas
+    public Olivar(int id, String ubicacion, double hectareas, double produccionAnual) {
+        this.id = id;
+        this.ubicacion = ubicacion;
+        this.hectareas = hectareas;
+        this.produccionAnual = produccionAnual;
+    }
+
+    //Constructor completo
     public Olivar(double hectareas, int id, double produccionAnual, String ubicacion, List<Cuadrilla> cuadrillas) {
         this.hectareas = hectareas;
         this.id = id;

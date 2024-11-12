@@ -9,20 +9,6 @@ import java.util.Properties;
  *
  */
 public class FactoriaConexion {
-
-    private static Connection conn;
-
-    private FactoriaConexion() {
-        // Constructor privado para evitar instancias
-    }
-
-    /**
-     * Me devuelve una conexión en función de lo encontrado en
-     * el fichero db.properties en el raíz del proyecto.
-     *
-     * @return el objeto con la conexión a la BBDD o
-     * null si no soporta el driver indicado.
-     */
     private static Connection connection = null;
 
     static {
@@ -54,4 +40,3 @@ public class FactoriaConexion {
         return connection;
     }
 }
-
