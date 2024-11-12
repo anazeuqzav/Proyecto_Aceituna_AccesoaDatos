@@ -5,9 +5,9 @@ import java.time.LocalDate;
 public class Produccion {
     // Atributos
     private int id;
+    private int cuadrilla_id;
     private int olivar_id;
     private int almazara_id;
-    private int cuadrilla_id;
     private LocalDate fecha;
     private double cantidadRecolectada;
 
@@ -15,11 +15,11 @@ public class Produccion {
     public Produccion() {
     }
 
-    public Produccion(int id, int olivar_id, int almazara_id, int cuadrilla_id, LocalDate fecha, double cantidadRecolectada) {
+    public Produccion(int id, int cuadrilla_id, int olivar_id, int almazara_id, LocalDate fecha, double cantidadRecolectada) {
         this.id = id;
+        this.cuadrilla_id = cuadrilla_id;
         this.olivar_id = olivar_id;
         this.almazara_id = almazara_id;
-        this.cuadrilla_id = cuadrilla_id;
         this.fecha = fecha;
         this.cantidadRecolectada = cantidadRecolectada;
     }

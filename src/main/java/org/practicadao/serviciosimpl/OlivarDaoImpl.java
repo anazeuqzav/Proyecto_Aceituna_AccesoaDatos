@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class OlivarDaoImpl implements OlivarDao {
+
+    // Atributo para la conexion
+    private Connection connection;
+
     // Atributos: Querys
     private static final String SAVE_QUERY = "INSERT INTO olivar (ubicacion, hectareas, produccionAnual) VALUES (?, ?, ?)";
     private static final String FIND_ONE_QUERY = "SELECT * FROM olivar WHERE id = ?";
@@ -24,16 +28,19 @@ public class OlivarDaoImpl implements OlivarDao {
     private static final String DELETE_QUERY = "DELETE FROM olivar WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM olivar";
 
+    // Constructor
+    public OlivarDaoImpl(){ connection = FactoriaConexion.getConnection();}
+
     /**
-     * Método para guardar un olivar
-     * @param olivar
-     * @return
+     * Método para guardar un olivar en la base de datos
+     *
+     * @param olivar que se desea guardar
+     * @return devuelve el olivar que se ha guardado
      * @throws DaoException
      */
     @Override
     public Olivar save(Olivar olivar) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, olivar.getUbicacion());
             statement.setDouble(2, olivar.getHectareas());
             statement.setDouble(3, olivar.getProduccionAnual());
@@ -59,15 +66,15 @@ public class OlivarDaoImpl implements OlivarDao {
     }
 
     /**
-     * Método para encontrar un olivar por un id
-     * @param id
-     * @return
+     * Método para encontrar un olivar por un id en la base de datos
+     *
+     * @param id identificador de l olivar que se desea buscar
+     * @return el olivar buscado si existe
      * @throws DaoException
      */
     @Override
     public Optional<Olivar> findById(int id) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -83,14 +90,14 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Encontrar todos los olivares que existen en la base de datos
-     * @return
+     *
+     * @return una lista de olivares
      * @throws DaoException
      */
     @Override
     public List<Olivar> findAll() throws DaoException {
         List<Olivar> olivares = new ArrayList<>();
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_QUERY);
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ALL_QUERY);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -105,16 +112,16 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para encontrar un olivar por el id de una cuadrilla
-     * @param idCuadrilla
-     * @return
+     *
+     * @param idCuadrilla identificador de la cuadrilla que ha trabajado en el olivar
+     * @return una lista de olivares donde ha trabajado la cuadrilla
      * @throws DaoException
      */
     @Override
     public List<Olivar> findByCuadrilla(int idCuadrilla) throws DaoException {
         List<Olivar> olivares = new ArrayList<>();
 
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(FIND_BY_CUADRILLA)) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_CUADRILLA)) {
             stmt.setInt(1, idCuadrilla);
             ResultSet rs = stmt.executeQuery();
 
@@ -134,14 +141,14 @@ public class OlivarDaoImpl implements OlivarDao {
     }
 
     /**
-     * Método para actualizar los datos de un olivar
-     * @param olivar
+     * Método para actualizar los datos de un olivar en la base de datos
+     *
+     * @param olivar el olivar que se quiere actualizar
      * @throws DaoException
      */
     @Override
     public void update(Olivar olivar) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
             statement.setString(1, olivar.getUbicacion());
             statement.setDouble(2, olivar.getHectareas());
             statement.setDouble(3, olivar.getProduccionAnual());
@@ -159,13 +166,13 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para eliminar un olivar de la base de datos
+     *
      * @param id identificador del olivar que se quiere eliminar
      * @throws DaoException
      */
     @Override
     public void delete(int id) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
             statement.setInt(1, id);
 
             int affectedRows = statement.executeUpdate();
@@ -182,13 +189,13 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método que cuenta la cantidad de olivares que hay en la base de datos
-     * @return
+     *
+     * @return número de olivares que se encuentran guardados en la base de datos
      * @throws DaoException
      */
     @Override
     public long count() throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT_QUERY);
+        try (PreparedStatement statement = connection.prepareStatement(COUNT_QUERY);
              ResultSet resultSet = statement.executeQuery()) {
 
             if (resultSet.next()) {

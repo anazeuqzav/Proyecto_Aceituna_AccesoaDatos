@@ -14,7 +14,7 @@ public class Main {
         CuadrillaDaoImpl cuadrillaDao = new CuadrillaDaoImpl();
 
         Trabajador t1 = new Trabajador("Ana", 29, "asdf", 1000.00);
-        Cuadrilla c1 = new Cuadrilla("fasdf", 14);
+        Cuadrilla c1 = new Cuadrilla("fasdf");
 
         trabajadorDao.save(t1);
         cuadrillaDao.save(c1);

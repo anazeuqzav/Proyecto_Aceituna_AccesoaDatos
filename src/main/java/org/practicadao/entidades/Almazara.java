@@ -2,20 +2,19 @@ package org.practicadao.entidades;
 
 public class Almazara {
     // Atributos
-    private double capacidad;
     private int id;
     private String nombre;
     private String ubicacion;
-
+    private double capacidad;
     // Constructores
     public Almazara() {
     }
 
-    public Almazara(double capacidad, int id, String nombre, String ubicacion) {
-        this.capacidad = capacidad;
+    public Almazara(int id, String nombre, String ubicacion, double capacidad) {
         this.id = id;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
+        this.capacidad = capacidad;
     }
 
     // Getters y setters

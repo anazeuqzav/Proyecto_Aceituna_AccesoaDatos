@@ -14,8 +14,12 @@ import java.util.Optional;
 
 public class CuadrillaDaoImpl implements CuadrillaDao {
 
-    // Atributos: Querys
-    private static final String SAVE_QUERY = "INSERT INTO cuadrilla (nombre, supervisor_id) VALUES (?, ?)";
+    // Atributo para la conexion
+    private Connection connection;
+
+    // Queries
+    //TODO: SAVE --> SIN SUPERVISOR ID PQ HABÍA UN ERROR !! PREGUNTAR
+    private static final String SAVE_QUERY = "INSERT INTO cuadrilla (nombre) VALUES (?)";
     private static final String FIND_ONE_QUERY = "SELECT * FROM cuadrilla WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM cuadrilla";
     private static final String FIND_BY_TRABAJADOR = "SELECT c.id, t.nombre, c.supervisor_id FROM cuadrilla c " +
@@ -29,6 +33,11 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM cuadrilla";
     private static final String ASOCIAR_TRABAJADOR = "INSERT INTO cuadrilla_trabajador (cuadrilla_id, trabajador_id) VALUES (?, ?)";
 
+
+    // Constructor
+    public CuadrillaDaoImpl(){ connection= FactoriaConexion.getConnection();}
+
+
     /**
      * Método que guarda una cuadrilla en la bases de datos aceituna_db, en la tabla cuadrilla.
      *
@@ -38,10 +47,8 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
      */
     @Override
     public Cuadrilla save(Cuadrilla cuadrilla) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, cuadrilla.getNombre());
-            statement.setInt(2, cuadrilla.getSupervisor_id());
 
             int affectedRows = statement.executeUpdate();
 
@@ -70,8 +77,7 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
      */
     @Override
     public Optional<Cuadrilla> findById(int id) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -94,8 +100,7 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
     @Override
     public List<Cuadrilla> findAll() throws DaoException {
         List<Cuadrilla> cuadrillas = new ArrayList<>();
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_QUERY);
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ALL_QUERY);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -118,9 +123,7 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
     @Override
     public List<Cuadrilla> findByTrabajador(int idTrabajador) throws DaoException {
         List<Cuadrilla> cuadrillas = new ArrayList<>();
-
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(FIND_BY_TRABAJADOR)) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_TRABAJADOR)) {
             stmt.setInt(1, idTrabajador);
             ResultSet rs = stmt.executeQuery();
 
@@ -149,8 +152,7 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
     public List<Cuadrilla> findByOlivar(int idOlivar) throws DaoException {
         List<Cuadrilla> cuadrillas = new ArrayList<>();
 
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(FIND_BY_OLIVAR)) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_OLIVAR)) {
             stmt.setInt(1, idOlivar);
             ResultSet rs = stmt.executeQuery();
 
@@ -176,8 +178,7 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
      */
     @Override
     public void update(Cuadrilla cuadrilla) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
             statement.setString(1, cuadrilla.getNombre());
             statement.setInt(2, cuadrilla.getSupervisor_id());
             statement.setInt(3, cuadrilla.getId());
@@ -201,8 +202,7 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
      */
     @Override
     public void delete(int id) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
             statement.setInt(1, id);
 
             int affectedRows = statement.executeUpdate();
@@ -222,8 +222,7 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
      */
     @Override
     public long count() throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT_QUERY);
+        try (PreparedStatement statement = connection.prepareStatement(COUNT_QUERY);
              ResultSet resultSet = statement.executeQuery()) {
 
             if (resultSet.next()) {
@@ -237,14 +236,14 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
 
     /**
      * Permite asociar una cuadrilla con un trabajador.
+     *
      * @param idCuadrilla identificador de la cuadrilla
      * @param idTrabajador identificador del trabajador
      */
     @Override
     public void asociarCuadrillaConTrabajador(int idCuadrilla, int idTrabajador) {
         String query = "INSERT INTO cuadrilla_trabajador (cuadrilla_id, trabajador_id) VALUES (?, ?)";
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idCuadrilla);
             stmt.setInt(2, idTrabajador);
             stmt.executeUpdate();
@@ -255,15 +254,15 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
     }
 
     /**
+     * Permite asociar una cuadrilla con un olivar
      *
-     * @param idCuadrilla
-     * @param idOlivar
+     * @param idCuadrilla identificador de la cuadrilla
+     * @param idOlivar identificador del olivar
      */
     @Override
     public void asociarCuadrillaConOlivar(int idCuadrilla, int idOlivar) {
         String query = "INSERT INTO cuadrilla_olivar (cuadrilla_id, olivar_id) VALUES (?, ?)";
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idCuadrilla);
             stmt.setInt(2, idOlivar);
             stmt.executeUpdate();

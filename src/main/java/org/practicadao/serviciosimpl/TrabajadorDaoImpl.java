@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class TrabajadorDaoImpl implements TrabajadorDao {
+
+    // Atributo para la conexion
+    private Connection connection;
+
     // Atributos: Querys
     private static final String SAVE_QUERY = "INSERT INTO trabajador (nombre, edad, puesto, salario) VALUES (?, ?, ?, ?)";
     private static final String FIND_ONE_QUERY = "SELECT * FROM trabajador WHERE id = ?";
@@ -22,6 +26,10 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
     private static final String DELETE_QUERY = "DELETE FROM trabajador WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM trabajador";
 
+    // Constructor
+    public TrabajadorDaoImpl(){ connection = FactoriaConexion.getConnection();}
+
+
     /**
      * Método para guardar un trabajador en la tabla trabajador de la bases de datos aceituna_db.
      *
@@ -31,8 +39,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
      */
     @Override
     public Trabajador save(Trabajador trabajador) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(SAVE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, trabajador.getNombre());
             statement.setInt(2, trabajador.getEdad());
             statement.setString(3, trabajador.getPuesto());
@@ -41,7 +48,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
             int affectedRows = statement.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new DaoException("La inserción no tuvo éxito, no se creó ningún cliente.");
+                throw new DaoException("La inserción no tuvo éxito, no se creó ningún trabajador.");
             }
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -60,15 +67,13 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
 
     /**
      * Método para buscar un trabajador por medio de un id en la tabla trabajador de la base de datos aceituna_db
-     *
      * @param id identificador del trabajador a buscar en la tabla
      * @return objeto Trabajador Encontrado
      * @throws DaoException
      */
     @Override
     public Optional<Trabajador> findById(int id) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -92,8 +97,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
     @Override
     public List<Trabajador> findAll() throws DaoException {
         List<Trabajador> trabajadores = new ArrayList<>();
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_QUERY);
+        try (PreparedStatement statement = connection.prepareStatement(FIND_ALL_QUERY);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
@@ -117,8 +121,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
     public List<Trabajador> findByCuadrilla(int idCuadrilla) throws DaoException {
         List<Trabajador> trabajadores = new ArrayList<>();
 
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(FIND_BY_CUADRILLA)) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_CUADRILLA)) {
             stmt.setInt(1, idCuadrilla);
             ResultSet rs = stmt.executeQuery();
 
@@ -139,14 +142,14 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
     }
 
     /**
-     * Actualizar datos de un trabajador
-     * @param trabajador
+     * Actualizar datos de un trabajador de la base de datos
+     *
+     * @param trabajador que se desea eliminar
      * @throws DaoException
      */
     @Override
     public void update(Trabajador trabajador) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUERY)) {
             statement.setString(1, trabajador.getNombre());
             statement.setInt(2, trabajador.getEdad());
             statement.setString(3, trabajador.getPuesto());
@@ -165,14 +168,14 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
     }
 
     /**
-     * Eliminar un trabajador
+     * Elimina un trabajador de la base de datos
+     *
      * @param id identificador del trabajador a eliminar
      * @throws DaoException
      */
     @Override
     public void delete(int id) throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(DELETE_QUERY)) {
             statement.setInt(1, id);
 
             int affectedRows = statement.executeUpdate();
@@ -195,8 +198,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
      */
     @Override
     public long count() throws DaoException {
-        try (Connection connection = FactoriaConexion.getConnection();
-             PreparedStatement statement = connection.prepareStatement(COUNT_QUERY);
+        try (PreparedStatement statement = connection.prepareStatement(COUNT_QUERY);
              ResultSet resultSet = statement.executeQuery()) {
 
             if (resultSet.next()) {
