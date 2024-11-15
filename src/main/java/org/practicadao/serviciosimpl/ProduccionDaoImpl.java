@@ -1,12 +1,12 @@
 package org.practicadao.serviciosimpl;
 
 import org.practicadao.conexion.FactoriaConexion;
-import org.practicadao.entidades.Almazara;
 import org.practicadao.entidades.Produccion;
 import org.practicadao.servicios.DaoException;
 import org.practicadao.servicios.ProduccionDao;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +20,11 @@ public class ProduccionDaoImpl implements ProduccionDao {
     private static final String SAVE_QUERY = "INSERT INTO produccion (cuadrilla_id, olivar_id, almazara_id, fecha, cantidadRecolectada) VALUES (?, ?, ?, ?, ?)";
     private static final String FIND_ONE_QUERY = "SELECT * FROM produccion WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM produccion";
+    private static final String FIND_BY_CUADRILLA_ALMAZARA_FECHA = "SELECT * FROM produccion p" +
+            " WHERE p.cuadrilla_id = ? AND p.almazara_id = ? AND p.fecha = ?;";
+    private static final String FIND_PRODUCCION_BY_ALMAZARA_HASTA_FECHA = "SELECT SUM(p.cantidadRecolectada) AS total_produccion " +
+            "FROM produccion p " +
+            "WHERE p.almazara_id = ? AND p.fecha <= ?;";
     private static final String UPDATE_QUERY = "UPDATE produccion SET cuadrilla_id = ?, olivar_id = ?, almazara_id = ?, fecha = ?, cantidadRecolectada = ?, WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM produccion WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM produccion";
@@ -29,7 +34,6 @@ public class ProduccionDaoImpl implements ProduccionDao {
 
     /**
      * Método para guardar la produccion en una base de datos
-     *
      * @param produccion objeto produccion que se quiere guardar
      * @return produccion guardada
      * @throws DaoException
@@ -65,7 +69,6 @@ public class ProduccionDaoImpl implements ProduccionDao {
 
     /**
      * Método para encontrar una produccion por un ID en la base de datos
-     *
      * @param id identificador de la produccion que se quiere buscar
      * @return produccion encontrada en la base de datos
      * @throws DaoException
@@ -89,7 +92,6 @@ public class ProduccionDaoImpl implements ProduccionDao {
 
     /**
      * Método para recuperar todas las producciones guardadas en la base de datos
-     *
      * @return una lista de produccion
      * @throws DaoException
      */
@@ -110,8 +112,53 @@ public class ProduccionDaoImpl implements ProduccionDao {
     }
 
     /**
+     * Recupera una produccion, de una cuadrilla concreta en una almazara concreta en una fecha concreta
+     * @param idCuadrilla Identificador de la cuadrilla que queremos buscar
+     * @param idAlmazara Identificador de la almazara a buscar
+     * @param fecha Fecha de la produccion que queremos buscar
+     * @return Produccion en esos datos concretos.
+     */
+    public Produccion findByCuadrillaAlmazaraYFecha(int idCuadrilla, int idAlmazara, LocalDate fecha) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_CUADRILLA_ALMAZARA_FECHA)) {
+            stmt.setInt(1, idCuadrilla);
+            stmt.setInt(2, idAlmazara);
+            stmt.setDate(3, java.sql.Date.valueOf(fecha));
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Produccion produccion = mapResultSetToProduccion(rs);
+                return produccion;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Devuelve la suma total de la cantidad recolectada de la produccion de una almazara HASTA una determinada fecha
+     * @param idAlmazara el identificador de la almazara
+     * @param fecha Hasta la fecha que se quiere mirar
+     * @return cantidad total recolectada en ese tiempo
+     */
+    public double findTotalProduccionByAlmazaraFecha(int idAlmazara, LocalDate fecha) {
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_PRODUCCION_BY_ALMAZARA_HASTA_FECHA)) {
+            stmt.setInt(1, idAlmazara);
+            stmt.setDate(2, java.sql.Date.valueOf(fecha));
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble("total_produccion"); // Obtiene la suma de la producción
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Si no hay resultados, devuelve 0
+    }
+
+
+    /**
      * Método para actualizar los datos de una produccion en la base de datos
-     *
      * @param produccion la produccion que se quiere actualizar
      * @throws DaoException
      */
@@ -137,7 +184,6 @@ public class ProduccionDaoImpl implements ProduccionDao {
 
     /**
      * Método para eliminar una produccion de la base de datos
-     *
      * @param id identificador de la produccion a eliminar
      * @throws DaoException
      */

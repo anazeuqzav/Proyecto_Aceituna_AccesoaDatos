@@ -1,5 +1,6 @@
 package org.practicadao.entidades;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Trabajador {
@@ -87,5 +88,23 @@ public class Trabajador {
 
     public void setCuadrillas(List<Cuadrilla> cuadrillas) {
         this.cuadrillas = cuadrillas;
+    }
+
+    public void agregarCuadrilla(Cuadrilla cuadrilla) {
+        if (!this.cuadrillas.contains(cuadrilla)) {
+            this.cuadrillas.add(cuadrilla);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "---------------------------------------------\n" +
+                "Trabajador  " + "\n" +
+                "ID:         " + id + "\n" +
+                "Nombre:     " + nombre + "\n" +
+                "Edad:       " + edad + " años\n" +
+                "Puesto:     " + puesto + "\n" +
+                "Salario:    " + salario + "\n" +
+                "Cuadrillas: " + (cuadrillas == null || cuadrillas.isEmpty() ? "No tiene" : cuadrillas) + "\n";
     }
 }

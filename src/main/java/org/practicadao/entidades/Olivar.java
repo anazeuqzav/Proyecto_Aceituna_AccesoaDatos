@@ -8,13 +8,19 @@ public class Olivar {
     private String ubicacion;
     private double hectareas;
     private double produccionAnual;
-
     private List<Cuadrilla> cuadrillas;
 
     // Constructores
     public Olivar() {
 
     }
+    //Constructor sin id y sin listas
+    public Olivar(String ubicacion, double hectareas, double produccionAnual) {
+        this.ubicacion = ubicacion;
+        this.hectareas = hectareas;
+        this.produccionAnual = produccionAnual;
+    }
+
     //Constructor sin listas
     public Olivar(int id, String ubicacion, double hectareas, double produccionAnual) {
         this.id = id;
@@ -22,6 +28,7 @@ public class Olivar {
         this.hectareas = hectareas;
         this.produccionAnual = produccionAnual;
     }
+
 
     //Constructor completo
     public Olivar(double hectareas, int id, double produccionAnual, String ubicacion, List<Cuadrilla> cuadrillas) {
@@ -72,4 +79,17 @@ public class Olivar {
     public void setCuadrillas(List<Cuadrilla> cuadrillas) {
         this.cuadrillas = cuadrillas;
     }
+
+    @Override
+    public String toString() {
+        return "---------------------------------------------\n" +
+                "Olivar                " + "\n" +
+                "ID:                   " + id + "\n" +
+                "Ubicacion:            " + ubicacion + "\n" +
+                "Hectáreas:            " + hectareas + "\n" +
+                "Producción anual:     " + produccionAnual + "\n" +
+                "Cuadrillas            " + cuadrillas + "\n";
+    }
+
+
 }

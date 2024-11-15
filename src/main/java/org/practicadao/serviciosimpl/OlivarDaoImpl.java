@@ -1,9 +1,7 @@
 package org.practicadao.serviciosimpl;
 
 import org.practicadao.conexion.FactoriaConexion;
-import org.practicadao.entidades.Cuadrilla;
 import org.practicadao.entidades.Olivar;
-import org.practicadao.entidades.Trabajador;
 import org.practicadao.servicios.DaoException;
 import org.practicadao.servicios.OlivarDao;
 
@@ -21,9 +19,9 @@ public class OlivarDaoImpl implements OlivarDao {
     private static final String SAVE_QUERY = "INSERT INTO olivar (ubicacion, hectareas, produccionAnual) VALUES (?, ?, ?)";
     private static final String FIND_ONE_QUERY = "SELECT * FROM olivar WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM olivar";
-    private static final String FIND_BY_CUADRILLA = "SELECT o.id, o.ubicacion, o.hectareas, o.produccionAnual, FROM olivar o " +
-            "INNER JOIN cuadrilla_olivar co ON o.id = co.olivar_id" +
-            "WHERE co.cuadrilla_id = ?";
+    private static final String FIND_BY_CUADRILLA = "SELECT * FROM olivar o " +
+            "INNER JOIN cuadrilla_olivar co ON o.id = co.olivar_id " +
+            "WHERE co.cuadrilla_id = ?;";
     private static final String UPDATE_QUERY = "UPDATE olivar SET ubcacion = ?, hectareas = ?, produccionAnual = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM olivar WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM olivar";
@@ -33,7 +31,6 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para guardar un olivar en la base de datos
-     *
      * @param olivar que se desea guardar
      * @return devuelve el olivar que se ha guardado
      * @throws DaoException
@@ -67,7 +64,6 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para encontrar un olivar por un id en la base de datos
-     *
      * @param id identificador de l olivar que se desea buscar
      * @return el olivar buscado si existe
      * @throws DaoException
@@ -90,7 +86,6 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Encontrar todos los olivares que existen en la base de datos
-     *
      * @return una lista de olivares
      * @throws DaoException
      */
@@ -112,7 +107,6 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para encontrar un olivar por el id de una cuadrilla
-     *
      * @param idCuadrilla identificador de la cuadrilla que ha trabajado en el olivar
      * @return una lista de olivares donde ha trabajado la cuadrilla
      * @throws DaoException
@@ -126,13 +120,8 @@ public class OlivarDaoImpl implements OlivarDao {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Olivar olivar = new Olivar(
-                        rs.getInt("id"),
-                        rs.getString("ubicacion"),
-                        rs.getDouble("hectareas"),
-                        rs.getDouble("produccionAnual")
-                );
-                olivares.add(olivar);
+                olivares.add(mapResultSetToOlivar(rs));
+
             }
         } catch (SQLException e) {
             throw new DaoException("Error al obtener todos los olivares.", e);
@@ -142,7 +131,6 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para actualizar los datos de un olivar en la base de datos
-     *
      * @param olivar el olivar que se quiere actualizar
      * @throws DaoException
      */
@@ -166,7 +154,6 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para eliminar un olivar de la base de datos
-     *
      * @param id identificador del olivar que se quiere eliminar
      * @throws DaoException
      */
@@ -189,7 +176,6 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método que cuenta la cantidad de olivares que hay en la base de datos
-     *
      * @return número de olivares que se encuentran guardados en la base de datos
      * @throws DaoException
      */
@@ -207,12 +193,22 @@ public class OlivarDaoImpl implements OlivarDao {
         return 0;
     }
 
+    /**
+     * Método para pasar de un conjunto de resultados de SQL a un objeto Olivar
+     * @param resultSet datos de la base de datos
+     * @return devolver olivar
+     * @throws SQLException
+     */
     private Olivar mapResultSetToOlivar(ResultSet resultSet) throws SQLException {
         Olivar olivar = new Olivar();
         olivar.setId(resultSet.getInt("id"));
         olivar.setUbicacion(resultSet.getString("ubicacion"));
         olivar.setHectareas(resultSet.getDouble("hectareas"));
         olivar.setProduccionAnual(resultSet.getDouble("produccionAnual"));
+
+        CuadrillaDaoImpl cuadrillaDao = new CuadrillaDaoImpl();
+        olivar.setCuadrillas(cuadrillaDao.findByOlivar(olivar.getId()));
+
 
         return olivar;
     }

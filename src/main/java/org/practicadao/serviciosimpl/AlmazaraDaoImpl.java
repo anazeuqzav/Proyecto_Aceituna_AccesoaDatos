@@ -2,14 +2,12 @@ package org.practicadao.serviciosimpl;
 
 import org.practicadao.conexion.FactoriaConexion;
 import org.practicadao.entidades.Almazara;
-import org.practicadao.entidades.Trabajador;
 import org.practicadao.servicios.AlmazaraDao;
 import org.practicadao.servicios.DaoException;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class AlmazaraDaoImpl implements AlmazaraDao {
 
@@ -20,6 +18,9 @@ public class AlmazaraDaoImpl implements AlmazaraDao {
     private static final String SAVE_QUERY = "INSERT INTO almazara (nombre, ubicacion, capacidad) VALUES (?, ?, ?)";
     private static final String FIND_ONE_QUERY = "SELECT * FROM almazara WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM almazara";
+    private static final String FIND_BY_CUADRILLA = "SELECT DISTINCT a.id, a.nombre, a.ubicacion, a.capacidad FROM almazara a " +
+            "JOIN produccion p ON p.almazara_id = a.id " +
+            "WHERE p.cuadrilla_id = ?;";
     private static final String UPDATE_QUERY = "UPDATE almazara SET nombre = ?, ubicacion = ?, capacidad = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM almazara WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM almazara";
@@ -29,7 +30,6 @@ public class AlmazaraDaoImpl implements AlmazaraDao {
 
     /**
      * Método para guardar una almazara en la base de datos
-     *
      * @param almazara que se quiere guardar
      * @return la almazara que se ha guardado
      * @throws DaoException
@@ -63,31 +63,29 @@ public class AlmazaraDaoImpl implements AlmazaraDao {
 
     /**
      * Método para buscar una almazara por id
-     *
      * @param id identificador de la almazara a buscar
      * @return almazara si se encuentra
      * @throws DaoException
      */
     @Override
-    public Optional<Almazara> findById(int id) throws DaoException {
+    public Almazara findById(int id) throws DaoException {
         try (PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(mapResultSetToAlmazara(resultSet));
+                    return mapResultSetToAlmazara(resultSet);
                 }
             }
         } catch (SQLException e) {
             throw new DaoException("Error al obtener la almazara por el ID.", e);
         }
 
-        return Optional.empty();
+        return null;
     }
 
     /**
      * Método para listar todas las almazaras que se encuentran en la base de datos
-     *
      * @return lista de almazara
      * @throws DaoException
      */
@@ -108,8 +106,28 @@ public class AlmazaraDaoImpl implements AlmazaraDao {
     }
 
     /**
+     * Método para devolver una lista de almazaras donde han llevado la produccion una cuadrilla
+     * concreta
+     * @param idCuadrilla el Identificador de la cuadrilla que queremos mirar
+     * @return lista de almazaras
+     */
+    public List<Almazara> findByCuadrilla(int idCuadrilla) {
+        List<Almazara> almazaras = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_BY_CUADRILLA)) {
+            stmt.setInt(1, idCuadrilla);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                almazaras.add(mapResultSetToAlmazara(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return almazaras;
+    }
+
+    /**
      * Método para actualizar los datos de una almazara que se encuentra en la base de datos
-     *
      * @param almazara para actualizar
      * @throws DaoException
      */
@@ -133,7 +151,6 @@ public class AlmazaraDaoImpl implements AlmazaraDao {
 
     /**
      * Método para eliminar una almazara de la base de datos
-     *
      * @param id identificador de la almazara a eliminar
      * @throws DaoException
      */
@@ -155,7 +172,6 @@ public class AlmazaraDaoImpl implements AlmazaraDao {
 
     /**
      * Método para contar la cantidad de almazaras que existen en la base de datos
-     *
      * @return el número de almazaras
      * @throws DaoException
      */

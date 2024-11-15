@@ -6,10 +6,19 @@ public class Almazara {
     private String nombre;
     private String ubicacion;
     private double capacidad;
+
     // Constructores
     public Almazara() {
     }
 
+    // Constructor sin id
+    public Almazara(String nombre, String ubicacion, double capacidad) {
+        this.nombre = nombre;
+        this.ubicacion = ubicacion;
+        this.capacidad = capacidad;
+    }
+
+    // Constructor completo
     public Almazara(int id, String nombre, String ubicacion, double capacidad) {
         this.id = id;
         this.nombre = nombre;
@@ -48,5 +57,15 @@ public class Almazara {
 
     public void setUbicacion(String ubicacion) {
         this.ubicacion = ubicacion;
+    }
+
+    @Override
+    public String toString() {
+        return "---------------------------------------------\n" +
+                "Almazara: " + "\n" +
+                "ID:              " + id + "\n" +
+                "Nombre:          " + nombre + "\n" +
+                "Ubicacion:       " + ubicacion + "\n" +
+                "Capacidad:       " + capacidad + "\n";
     }
 }

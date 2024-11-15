@@ -81,4 +81,16 @@ public class Cuadrilla {
     public void setOlivares(List<Olivar> olivares) {
         this.olivares = olivares;
     }
+
+    public void agregarTrabajador(Trabajador trabajador) {
+        if (!this.trabajadores.contains(trabajador)) {
+            this.trabajadores.add(trabajador);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "\n • ID: " + id + "| Nombre: " + nombre + "| Supervisor ID: " + supervisor_id;
+
+    }
 }

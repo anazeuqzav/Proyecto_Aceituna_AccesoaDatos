@@ -15,6 +15,16 @@ public class Produccion {
     public Produccion() {
     }
 
+    // Constructor sin id
+    public Produccion(int cuadrilla_id, int olivar_id, int almazara_id, LocalDate fecha, double cantidadRecolectada) {
+        this.cuadrilla_id = cuadrilla_id;
+        this.olivar_id = olivar_id;
+        this.almazara_id = almazara_id;
+        this.fecha = fecha;
+        this.cantidadRecolectada = cantidadRecolectada;
+    }
+
+    // Constructor completo
     public Produccion(int id, int cuadrilla_id, int olivar_id, int almazara_id, LocalDate fecha, double cantidadRecolectada) {
         this.id = id;
         this.cuadrilla_id = cuadrilla_id;
@@ -72,4 +82,17 @@ public class Produccion {
     public void setCantidadRecolectada(double cantidadRecolectada) {
         this.cantidadRecolectada = cantidadRecolectada;
     }
+
+    @Override
+    public String toString() {
+      return "---------------------------------------------\n" +
+              "Produccion " + "\n" +
+              "ID:                   " + id + "\n" +
+              "ID Cuadrilla:         " + cuadrilla_id + "\n" +
+              "ID Olivar:            " + olivar_id + "\n" +
+              "ID Almazara:          " + almazara_id + "\n" +
+              "Fecha:                " + fecha + "\n" +
+              "Cantidad recolectada: " + cantidadRecolectada + "\n";
+    }
+
 }
