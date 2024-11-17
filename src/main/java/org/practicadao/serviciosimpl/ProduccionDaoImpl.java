@@ -25,6 +25,12 @@ public class ProduccionDaoImpl implements ProduccionDao {
     private static final String FIND_PRODUCCION_BY_ALMAZARA_HASTA_FECHA = "SELECT SUM(p.cantidadRecolectada) AS total_produccion " +
             "FROM produccion p " +
             "WHERE p.almazara_id = ? AND p.fecha <= ?;";
+    private static final String FIND_TOTAL_PRODUCCION_BY_OLIVAR_HASTA_FECHA = "SELECT SUM(p.cantidadRecolectada) AS total_produccion " +
+            "FROM produccion p " +
+            "WHERE p.olivar_id = ? AND p.fecha <= ?;";
+    private static final String FIND_TOTAL_PRODUCCION_BY_CUADRILLA_HASTA_FECHA = "SELECT SUM(p.cantidadRecolectada) AS total_produccion " +
+            "FROM produccion p " +
+            "WHERE p.cuadrilla_id = ? AND p.fecha <= ?;";
     private static final String UPDATE_QUERY = "UPDATE produccion SET cuadrilla_id = ?, olivar_id = ?, almazara_id = ?, fecha = ?, cantidadRecolectada = ?, WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM produccion WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM produccion";
@@ -154,6 +160,49 @@ public class ProduccionDaoImpl implements ProduccionDao {
             e.printStackTrace();
         }
         return 0; // Si no hay resultados, devuelve 0
+    }
+
+    /**
+     * Método que que devuelve la cantidad recolectada por Olivar hasta una fecha concreta
+     * @param olivarId identificador de olivar
+     * @param fecha fecha hasta la que se quiere comprobar la produccion
+     * @return cantidad total recolectada
+     */
+    public double findTotalProduccionByOlivarYFecha(int olivarId, LocalDate fecha) {
+        double produccionTotal = 0;
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_TOTAL_PRODUCCION_BY_OLIVAR_HASTA_FECHA)) {
+            stmt.setInt(1, olivarId);
+            stmt.setDate(2, java.sql.Date.valueOf(fecha));
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                produccionTotal = rs.getDouble("total_produccion");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produccionTotal;
+    }
+
+    /**
+     * Método para devulver la produccion total de una cuadrilla hasta una fecha concreta
+     * @param cuadrillaId Identificador de la cuadrilla
+     * @param fecha fecha hasta la que se quiere comprobar la recoleccion
+     * @return cantidad total recolectada
+     */
+    public double findTotalProduccionByCuadrillaYFecha(int cuadrillaId, LocalDate fecha) {
+        double produccionTotal = 0;
+        try (PreparedStatement stmt = connection.prepareStatement(FIND_TOTAL_PRODUCCION_BY_CUADRILLA_HASTA_FECHA)) {
+            stmt.setInt(1, cuadrillaId);
+            stmt.setDate(2, java.sql.Date.valueOf(fecha));
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                produccionTotal = rs.getDouble("total_produccion");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produccionTotal;
     }
 
 

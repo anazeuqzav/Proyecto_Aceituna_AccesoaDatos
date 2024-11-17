@@ -217,6 +217,7 @@ public class TrabajadorDaoImpl implements TrabajadorDao {
         trabajador.setNombre(resultSet.getString("nombre"));
         trabajador.setEdad(resultSet.getInt("edad"));
         trabajador.setPuesto(resultSet.getString("puesto"));
+        trabajador.setSalario(resultSet.getDouble("salario"));
 
         CuadrillaDaoImpl cuadrillaDao = new CuadrillaDaoImpl();
 

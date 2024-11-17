@@ -8,7 +8,6 @@ import org.practicadao.servicios.OlivarDao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class OlivarDaoImpl implements OlivarDao {
 
@@ -64,24 +63,25 @@ public class OlivarDaoImpl implements OlivarDao {
 
     /**
      * Método para encontrar un olivar por un id en la base de datos
+     *
      * @param id identificador de l olivar que se desea buscar
      * @return el olivar buscado si existe
      * @throws DaoException
      */
     @Override
-    public Optional<Olivar> findById(int id) throws DaoException {
+    public Olivar findById(int id) throws DaoException {
         try (PreparedStatement statement = connection.prepareStatement(FIND_ONE_QUERY)) {
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Optional.of(mapResultSetToOlivar(resultSet));
+                    return mapResultSetToOlivar(resultSet);
                 }
             }
         } catch (SQLException e) {
             throw new DaoException("Error al obtener el olivar por el ID.", e);
         }
-        return Optional.empty();
+        return null;
     }
 
     /**

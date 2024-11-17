@@ -14,7 +14,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         int input;
         String opcion;
-        boolean validacion = false; // variable para validar los datos
+        boolean validacion = false;
 
         // Inicializar DAOs
         TrabajadorDaoImpl trabajadorDao = new TrabajadorDaoImpl();
@@ -23,32 +23,40 @@ public class Main {
         AlmazaraDaoImpl almazaraDao = new AlmazaraDaoImpl();
         ProduccionDaoImpl produccionDao = new ProduccionDaoImpl();
 
-        //cargarDatos(); // Comentar una vez cargados los datos para evitar duplicados si se va a volver a ejecutar la aplicación
+        cargarDatos(); // Comentar una vez cargados los datos para evitar duplicados si se va a volver a ejecutar la aplicación
 
         do {
             System.out.println("""
-╔══════════════════════════════════════════════════════════╗
-║         BIENVENIDO A LA CAMPAÑA DE ACEITUNA 2024         ║
-╠══════════════════════════════════════════════════════════╣
-║ Seleccione una opción de las siguientes:                 ║
-║                                                          ║
-║   1. Mostrar los trabajadores de una determinada         ║
-║      cuadrilla.                                          ║
-║   2. Mostrar las cuadrillas que supervisa un             ║
-║      determinado trabajador.                             ║
-║   3. Mostrar los olivares donde trabaja una              ║
-║      determinada cuadrilla.                              ║
-║   4. Mostrar las cuadrillas que trabajan en un           ║
-║      determinado olivar.                                 ║
-║   5. Mostrar las almazaras donde lleva aceituna          ║
-║      una determinada cuadrilla.                          ║
-║   6. Mostrar la producción en una fecha concreta, de     ║
-║      una cuadrilla concreta en una almazara concreta.    ║
-║   7. Mostrar la cantidad total recolectada hasta una     ║
-║      determinada fecha, de una determinada almazara.     ║
-║   8. Salir.                                              ║
-╚══════════════════════════════════════════════════════════╝
-""");
+                    ╔═══════════════════════════════════════════════════════════╗
+                    ║         BIENVENIDO A LA CAMPAÑA DE ACEITUNA 2024          ║
+                    ╠═══════════════════════════════════════════════════════════╣
+                    ║ Seleccione una opción de las siguientes:                  ║
+                    ║                                                           ║
+                    ║   1. Mostrar los trabajadores de una determinada          ║
+                    ║      cuadrilla.                                           ║
+                    ║   2. Mostrar las cuadrillas que supervisa un              ║
+                    ║      determinado trabajador.                              ║
+                    ║   3. Mostrar los olivares donde trabaja una               ║
+                    ║      determinada cuadrilla.                               ║
+                    ║   4. Mostrar las cuadrillas que trabajan en un            ║
+                    ║      determinado olivar.                                  ║
+                    ║   5. Mostrar las almazaras donde lleva aceituna           ║
+                    ║      una determinada cuadrilla.                           ║
+                    ║   6. Mostrar la producción en una fecha concreta, de      ║
+                    ║      una cuadrilla concreta en una almazara concreta.     ║
+                    ║   7. Mostrar la producción hasta una determinada fecha,   ║
+                    ║      de una determinada almazara.                         ║
+                    ║   8. Mostrar la producción hasta una determinada fecha,   ║
+                    ║      de un determinado olivar (en todas las almazaras y   ║
+                    ║      de todas lascuadrillas que trabajan allí).           ║
+                    ║   9. Mostrar la producción hasta una determinada fecha,   ║
+                    ║      de una cuadrilla determinada (en todas las almazaras ║
+                    ║      y de todos los olivares en los que trabaja dicha     ║
+                    ║      cuadrilla).                                          ║
+                    ║   10. Salir.                                              ║
+                    ╚═══════════════════════════════════════════════════════════╝
+                    """);
+
             opcion = sc.nextLine();
 
             switch (opcion) {
@@ -87,7 +95,7 @@ public class Main {
                                 System.out.println(cuadrillas);
                                 validacion = true;
                             } else {
-                                System.out.println("El trabajador no es un Supervisor o no existe.");
+                                System.out.println("El trabajador no es un supervisor o no existe en la base de datos.");
                             }
 
                         } catch (InputMismatchException e) {
@@ -135,7 +143,7 @@ public class Main {
                                 System.out.println(cuadrillas);
                                 validacion = true;
                             } else {
-                                System.out.println("El olivar no existe o no tiene cuadrillas");
+                                System.out.println("El olivar no existe o no tiene cuadrillas asociadas");
                             }
 
                         } catch (InputMismatchException e) {
@@ -149,7 +157,7 @@ public class Main {
                 // Mostrar las almazaras donde lleva aceituna una determinada cuadrilla.
                 case "5":
                     validacion = false;
-                    do{
+                    do {
                         try {
                             System.out.println("Introduce el ID de la cuadrilla: ");
                             input = sc.nextInt();
@@ -172,139 +180,227 @@ public class Main {
 
                 // Mostrar la producción en una fecha concreta, de una cuadrilla concreta en una almazara concreta.
                 case "6":
-                    validacion = false;
-                    do {
-                        try {
-                            // Validar ID de la cuadrilla
-                            boolean cuadrillaValida = false;
-                            int idCuadrilla = -1;
-                            while (!cuadrillaValida) {
-                                try {
-                                    System.out.println("Introduce el ID de la cuadrilla: ");
-                                    idCuadrilla = sc.nextInt();
-                                    sc.nextLine(); // Limpiar buffer
-                                    if (cuadrillaDao.findById(idCuadrilla) != null) {
-                                        cuadrillaValida = true;
-                                    } else {
-                                        System.out.println("La cuadrilla no existe. Inténtalo de nuevo.");
-                                    }
-                                } catch (InputMismatchException e) {
-                                    System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
-                                    sc.nextLine(); // Limpiar buffer
+                    try {
+                        // Validar ID de la cuadrilla
+                        boolean cuadrillaValida = false;
+                        int idCuadrilla = -1;
+                        while (!cuadrillaValida) {
+                            try {
+                                System.out.println("Introduce el ID de la cuadrilla: ");
+                                idCuadrilla = sc.nextInt();
+                                sc.nextLine();
+                                if (cuadrillaDao.findById(idCuadrilla) != null) {
+                                    cuadrillaValida = true;
+                                } else {
+                                    System.out.println("La cuadrilla no existe. Inténtalo de nuevo.");
                                 }
+                            } catch (InputMismatchException e) {
+                                System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
+                                sc.nextLine();
                             }
-
-                            // Validar ID de la almazara
-                            boolean almazaraValida = false;
-                            int idAlmazara = -1;
-                            while (!almazaraValida) {
-                                try {
-                                    System.out.println("Introduce el ID de la almazara: ");
-                                    idAlmazara = sc.nextInt();
-                                    sc.nextLine(); // Limpiar buffer
-                                    if (almazaraDao.findById(idAlmazara) != null) {
-                                        almazaraValida = true;
-                                    } else {
-                                        System.out.println("La almazara no existe. Inténtalo de nuevo.");
-                                    }
-                                } catch (InputMismatchException e) {
-                                    System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
-                                    sc.nextLine(); // Limpiar buffer
-                                }
-                            }
-
-                            // Validar fecha
-                            boolean fechaValida = false;
-                            LocalDate fecha = null;
-                            while (!fechaValida) {
-                                try {
-                                    System.out.println("Introduce la fecha: (aaaa-mm-dd): ");
-                                    fecha = LocalDate.parse(sc.next());
-                                    sc.nextLine(); // Limpiar buffer
-                                    fechaValida = true;
-                                } catch (DateTimeParseException e) {
-                                    System.err.println("Formato de fecha no válido. Usa el formato aaaa-mm-dd.");
-                                }
-                            }
-
-                            // Buscar la producción
-                            Produccion produccion = produccionDao.findByCuadrillaAlmazaraYFecha(idCuadrilla, idAlmazara, fecha);
-
-                            if (produccion != null) {
-                                System.out.println(produccion);
-                                validacion = true; // Salir del bucle
-                            } else {
-                                System.out.println("No se encontró producción para los datos especificados.");
-                                validacion = true; // Sale del bucle si no hay ninguna produccion
-
-                            }
-
-                        } catch (Exception e) {
-                            System.err.println("Ocurrió un error: " + e.getMessage());
                         }
-                    } while (!validacion);
+
+                        // Validar ID de la almazara
+                        boolean almazaraValida = false;
+                        int idAlmazara = -1;
+                        while (!almazaraValida) {
+                            try {
+                                System.out.println("Introduce el ID de la almazara: ");
+                                idAlmazara = sc.nextInt();
+                                sc.nextLine();
+                                if (almazaraDao.findById(idAlmazara) != null) {
+                                    almazaraValida = true;
+                                } else {
+                                    System.out.println("La almazara no existe. Inténtalo de nuevo.");
+                                }
+                            } catch (InputMismatchException e) {
+                                System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
+                                sc.nextLine();
+                            }
+                        }
+
+                        // Validar fecha
+                        boolean fechaValida = false;
+                        LocalDate fecha = null;
+                        while (!fechaValida) {
+                            try {
+                                System.out.println("Introduce la fecha: (aaaa-mm-dd): ");
+                                fecha = LocalDate.parse(sc.next());
+                                sc.nextLine();
+                                fechaValida = true;
+                            } catch (DateTimeParseException e) {
+                                System.err.println("Formato de fecha no válido");
+                            }
+                        }
+
+                        // Buscar la producción
+                        Produccion produccion = produccionDao.findByCuadrillaAlmazaraYFecha(idCuadrilla, idAlmazara, fecha);
+
+                        // Sale del bucle si no hay ninguna produccion
+                        if (produccion != null) {
+                            System.out.println(produccion);
+                        } else {
+                            System.out.println("No se encontró producción para los datos especificados.");
+                        }
+
+                    } catch (Exception e) {
+                        System.err.println("Ocurrió un error: " + e.getMessage());
+                    }
                     break;
 
                 //Mostrar la producción hasta una determinada fecha, de una determinada almazara.
                 case "7":
-                    validacion = false;
-                    do {
-                        try {
-                            // Validar ID de la almazara
-                            boolean almazaraValida = false;
-                            int idAlmazara = -1;
-                            while (!almazaraValida) {
-                                try {
-                                    System.out.println("Introduce el ID de la almazara: ");
-                                    idAlmazara = sc.nextInt();
-                                    sc.nextLine(); // Limpiar buffer
-                                    if (almazaraDao.findById(idAlmazara) != null) {
-                                        almazaraValida = true;
-                                    } else {
-                                        System.out.println("La almazara introducida no existe. Inténtalo de nuevo.");
+                    try {
+                        // Validar ID de la almazara
+                        boolean almazaraValida = false;
+                        int idAlmazara = -1;
+                        while (!almazaraValida) {
+                            try {
+                                System.out.println("Introduce el ID de la almazara: ");
+                                idAlmazara = sc.nextInt();
+                                sc.nextLine();
+                                if (almazaraDao.findById(idAlmazara) != null) {
+                                    almazaraValida = true;
+                                } else {
+                                    System.out.println("La almazara introducida no existe. Inténtalo de nuevo.");
 
-                                    }
-                                } catch (InputMismatchException e) {
-                                    System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
-                                    sc.nextLine(); // Limpiar buffer
                                 }
+                            } catch (InputMismatchException e) {
+                                System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
+                                sc.nextLine();
                             }
-
-                            // Validar fecha
-                            boolean fechaValida = false;
-                            LocalDate fecha = null;
-                            while (!fechaValida) {
-                                try {
-                                    System.out.println("Introduce la fecha hasta la que desea obtener la producción (aaaa-mm-dd): ");
-                                    fecha = LocalDate.parse(sc.next());
-                                    sc.nextLine(); // Limpiar buffer
-                                    fechaValida = true;
-                                } catch (DateTimeParseException e) {
-                                    System.err.println("Formato de fecha no válido. Usa el formato aaaa-mm-dd.");
-                                }
-                            }
-
-                            // Obtener la producción total
-                            double produccionTotal = produccionDao.findTotalProduccionByAlmazaraFecha(idAlmazara, fecha);
-
-                            if (produccionTotal != 0) {
-                                System.out.println("La producción total de la almazara " + idAlmazara + " hasta la fecha " + fecha + " es: " + produccionTotal);
-                                validacion = true; // Salir del bucle principal
-                            } else {
-                                System.out.println("No existe producción para la almazara y fecha introducida.");
-                                validacion = true; // Sale del bucle si no hay ninguna produccion
-                            }
-
-                        } catch (Exception e) {
-                            System.err.println("Ocurrió un error: " + e.getMessage());
                         }
-                    } while (!validacion);
+
+                        // Validar fecha
+                        boolean fechaValida = false;
+                        LocalDate fecha = null;
+                        while (!fechaValida) {
+                            try {
+                                System.out.println("Introduce la fecha hasta la que desea obtener la producción (aaaa-mm-dd): ");
+                                fecha = LocalDate.parse(sc.next());
+                                sc.nextLine();
+                                fechaValida = true;
+                            } catch (DateTimeParseException e) {
+                                System.err.println("Formato de fecha no válido.");
+                            }
+                        }
+
+                        // Obtener la producción total
+                        double produccionTotal = produccionDao.findTotalProduccionByAlmazaraFecha(idAlmazara, fecha);
+
+                        if (produccionTotal != 0) {
+                            System.out.println("La producción total de la almazara " + idAlmazara + " hasta la fecha " + fecha + " es: " + produccionTotal);
+                        } else {
+                            System.out.println("No existe producción para la almazara y fecha introducida.");
+                        }
+
+                    } catch (Exception e) {
+                        System.err.println("Ocurrió un error: " + e.getMessage());
+                    }
                     break;
+
+                // Mostrar la producción hasta una determinada fecha de un determinado olivar
+                case "8":
+                    // Validar el ID del olivar
+                    boolean olivarValido = false;
+                    int idOlivar = -1;
+                    while (!olivarValido) {
+                        try {
+                            System.out.println("Introduce el ID del olivar: ");
+                            idOlivar = sc.nextInt();
+                            sc.nextLine();
+                            if (olivarDao.findById(idOlivar) != null) {
+                                olivarValido = true;
+                            } else {
+                                System.out.println("El olivar introducido no existe. Inténtalo de nuevo.");
+                            }
+                        } catch (InputMismatchException e) {
+                            System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
+                            sc.nextLine();
+                        }
+                    }
+
+                    // Validar la fecha
+                    boolean fechaValida = false;
+                    LocalDate fecha = null;
+                    while (!fechaValida) {
+                        try {
+                            System.out.println("Introduce la fecha hasta la que desea obtener la producción (aaaa-mm-dd): ");
+                            fecha = LocalDate.parse(sc.next());
+                            sc.nextLine();
+                            fechaValida = true;
+                        } catch (DateTimeParseException e) {
+                            System.err.println("Formato de fecha no válido. Usa el formato aaaa-mm-dd.");
+                        }
+                    }
+
+                    // Obtener la producción total
+                    double produccionTotal = produccionDao.findTotalProduccionByOlivarYFecha(idOlivar, fecha);
+
+                    if (produccionTotal != 0) {
+                        System.out.println("La producción total del olivar " + idOlivar + " hasta la fecha " + fecha + " es: " + produccionTotal);
+                    } else {
+                        System.out.println("No existe producción para el olivar y fecha introducidos.");
+                    }
+                    break;
+
+
+                case "9":
+                    // Validar el ID de la cuadrilla
+                    boolean cuadrillaValida = false;
+                    int idCuadrilla = -1;
+                    while (!cuadrillaValida) {
+                        try {
+                            System.out.println("Introduce el ID de la cuadrilla: ");
+                            idCuadrilla = sc.nextInt();
+                            sc.nextLine();
+                            if (cuadrillaDao.findById(idCuadrilla) != null) {
+                                cuadrillaValida = true;
+                            } else {
+                                System.out.println("La cuadrilla introducida no existe. Inténtalo de nuevo.");
+                            }
+                        } catch (InputMismatchException e) {
+                            System.err.println("No has introducido un identificador válido. Inténtalo de nuevo.");
+                            sc.nextLine();
+                        }
+                    }
+
+                    // Validar la fecha
+                    fechaValida = false;
+                    fecha = null;
+                    while (!fechaValida) {
+                        try {
+                            System.out.println("Introduce la fecha hasta la que desea obtener la producción (aaaa-mm-dd): ");
+                            fecha = LocalDate.parse(sc.next());
+                            sc.nextLine(); // Limpiar buffer
+                            fechaValida = true;
+                        } catch (DateTimeParseException e) {
+                            System.err.println("Formato de fecha no válido. Usa el formato aaaa-mm-dd.");
+                        }
+                    }
+
+                    // Obtener la producción total
+                    produccionTotal = produccionDao.findTotalProduccionByCuadrillaYFecha(idCuadrilla, fecha);
+
+                    if (produccionTotal != 0) {
+                        System.out.println("La producción total de la cuadrilla " + idCuadrilla + " hasta la fecha " + fecha + " es: " + produccionTotal);
+                    } else {
+                        System.out.println("No existe producción para la cuadrilla y fecha introducidas.");
+                    }
+                    break;
+
+                //Salir
+                case "10":
+                    System.out.println("Saliendo del programa...");
+                    break;
+
                 default:
                     System.out.println("Introduce una opción válida");
                     break;
             }
-        } while (!opcion.equals("8"));
+
+        } while (!opcion.equals("10"));
+
     }
 
     /**
@@ -346,7 +442,7 @@ public class Main {
 
         // Crear y guardar 5 cuadrillas, asignando un supervisor
         List<Cuadrilla> cuadrillas = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 1; i <= 5; i++) {
             Cuadrilla cuadrilla = new Cuadrilla("Cuadrilla " + i, supervisores.get(i).getId());
             cuadrillaDao.save(cuadrilla);
             cuadrillas.add(cuadrilla);
@@ -402,9 +498,9 @@ public class Main {
             Produccion produccion = new Produccion(cuadrilla.getId(), olivar.getId(), almazara.getId(), fecha, cantidadRecolectada);
             produccionDao.save(produccion);
         }
+
         System.out.println("Datos de prueba generados exitosamente.");
     }
-
 }
 
 

@@ -88,6 +88,12 @@ public class Cuadrilla {
         }
     }
 
+    /**
+     * Método toString. Para no entrar en el bucle infinito de llamar trabajadores y cuadrillas y
+     * olivares y cuadrillas, este toString no muestra las listas de Trabajadores ni de Olivares.
+     * Pero las clases Trabajador y Olivar si muestran las cuadrillas.
+     * @return
+     */
     @Override
     public String toString() {
         return "\n • ID: " + id + "| Nombre: " + nombre + "| Supervisor ID: " + supervisor_id;
