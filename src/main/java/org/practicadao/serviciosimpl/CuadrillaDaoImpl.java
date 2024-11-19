@@ -15,7 +15,6 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
     private Connection connection;
 
     // Queries
-    //TODO: SAVE --> SIN SUPERVISOR ID PQ HABÍA UN ERROR !! PREGUNTAR
     private static final String SAVE_QUERY = "INSERT INTO cuadrilla (nombre, supervisor_id) VALUES (?, ?)";
     private static final String FIND_ONE_QUERY = "SELECT * FROM cuadrilla WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM cuadrilla";
@@ -30,9 +29,6 @@ public class CuadrillaDaoImpl implements CuadrillaDao {
     private static final String UPDATE_QUERY = "UPDATE cuadrilla SET nombre = ?, supervisor_id = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM cuadrilla WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM cuadrilla";
-    private static final String ASOCIAR_TRABAJADOR = "INSERT INTO cuadrilla_trabajador (cuadrilla_id, trabajador_id) VALUES (?, ?)";
-
-    private static final String xD="select * from trabjar where puesto=Super and id=?";
 
     // Constructor
     public CuadrillaDaoImpl() {

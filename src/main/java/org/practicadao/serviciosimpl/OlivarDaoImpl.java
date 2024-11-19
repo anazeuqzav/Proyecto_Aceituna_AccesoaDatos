@@ -21,7 +21,7 @@ public class OlivarDaoImpl implements OlivarDao {
     private static final String FIND_BY_CUADRILLA = "SELECT * FROM olivar o " +
             "INNER JOIN cuadrilla_olivar co ON o.id = co.olivar_id " +
             "WHERE co.cuadrilla_id = ?;";
-    private static final String UPDATE_QUERY = "UPDATE olivar SET ubcacion = ?, hectareas = ?, produccionAnual = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE olivar SET ubicacion = ?, hectareas = ?, produccionAnual = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM olivar WHERE id = ?";
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM olivar";
 
@@ -40,7 +40,6 @@ public class OlivarDaoImpl implements OlivarDao {
             statement.setString(1, olivar.getUbicacion());
             statement.setDouble(2, olivar.getHectareas());
             statement.setDouble(3, olivar.getProduccionAnual());
-
 
             int affectedRows = statement.executeUpdate();
 
