@@ -1,13 +1,25 @@
 package org.practicadao.entidades;
 
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Olivar {
     // Atributos
+    @XmlAttribute(name = "id")
     private int id;
+
+    @XmlElement(name = "ubicacion")
     private String ubicacion;
+
+    @XmlElement(name = "hectareas")
     private double hectareas;
+
+    @XmlElement(name = "produccion_anual")
     private double produccionAnual;
+
+    @XmlElementWrapper(name = "cuadrillas")
+    @XmlElement(name = "cuadrilla")
     private List<Cuadrilla> cuadrillas;
 
     // Constructores

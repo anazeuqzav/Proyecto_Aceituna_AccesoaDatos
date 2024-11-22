@@ -1,16 +1,30 @@
 package org.practicadao.entidades;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Trabajador {
 
     // Atributos
+    @XmlAttribute(name = "id")
     private int id;
+
+    @XmlElement(name = "nombre")
     private String nombre;
+
+    @XmlElement(name = "edad")
     private int edad;
+
+    @XmlElement(name = "puesto")
     private String puesto;
+
+    @XmlElement(name = "salario")
     private double salario;
+
+    @XmlElementWrapper(name = "cuadrillas")
+    @XmlElement(name = "cuadrilla")
     private List<Cuadrilla> cuadrillas;
 
     // Constructores

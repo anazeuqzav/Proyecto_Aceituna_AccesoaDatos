@@ -1,11 +1,21 @@
 package org.practicadao;
 
+import org.practicadao.conexion.FactoriaConexion;
 import org.practicadao.entidades.*;
+import org.practicadao.servicios.DaoException;
 import org.practicadao.serviciosimpl.*;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+
+import static org.practicadao.conexion.FactoriaConexion.createTriggers;
+import static org.practicadao.marshalling.MarshallingJSON.loadGson;
+import static org.practicadao.marshalling.MarshallingJSON.saveJSON;
+import static org.practicadao.marshalling.MarshallingXML.*;
 
 
 public class Main {
@@ -23,7 +33,20 @@ public class Main {
         AlmazaraDaoImpl almazaraDao = new AlmazaraDaoImpl();
         ProduccionDaoImpl produccionDao = new ProduccionDaoImpl();
 
-        cargarDatos(); // Comentar una vez cargados los datos para evitar duplicados si se va a volver a ejecutar la aplicación
+        //Inicialización de listas
+        List<Almazara> almazaras;
+        List<Cuadrilla> cuadrillas;
+        List<Olivar> olivares;
+        List<Produccion> producciones;
+        List<Trabajador> trabajadores;
+
+        /*
+        Comentar una vez cargados los datos para evitar duplicados si se va a
+        volver a ejecutar la aplicación. Dentro de este método se encuentra el método para crear el trigger
+         */
+
+        cargarDatos();
+
 
         do {
             System.out.println("""
@@ -52,8 +75,13 @@ public class Main {
                     ║   9. Mostrar la producción hasta una determinada fecha,   ║
                     ║      de una cuadrilla determinada (en todas las almazaras ║
                     ║      y de todos los olivares en los que trabaja dicha     ║
-                    ║      cuadrilla).                                          ║
-                    ║   10. Salir.                                              ║
+                    ║      cuadrilla).                                          ║   
+                    ║   10. Guardar XML.                                        ║ 
+                    ║   11. Cargar desde archivo XML.                           ║ 
+                    ║   12. Guardar JSON.                                       ║ 
+                    ║   13. Cargar desde archivo JSON.                          ║
+                    ║   14. Crear una producción.                               ║     
+                    ║   15. Salir.                                              ║
                     ╚═══════════════════════════════════════════════════════════╝
                     """);
 
@@ -66,7 +94,7 @@ public class Main {
                         System.out.println("Introduce el ID de la cuadrilla: ");
                         try {
                             input = sc.nextInt();
-                            List<Trabajador> trabajadores = trabajadorDao.findByCuadrilla(input);
+                            trabajadores = trabajadorDao.findByCuadrilla(input);
 
                             if (!trabajadores.isEmpty()) {
                                 System.out.println(trabajadores);
@@ -89,7 +117,7 @@ public class Main {
                         try {
                             System.out.println("Introduce el ID del trabajador: ");
                             input = sc.nextInt();
-                            List<Cuadrilla> cuadrillas = cuadrillaDao.findBySupervisor(input);
+                            cuadrillas = cuadrillaDao.findBySupervisor(input);
 
                             if (!cuadrillas.isEmpty()) {
                                 System.out.println(cuadrillas);
@@ -112,7 +140,7 @@ public class Main {
                         try {
                             System.out.println("Introduce el ID de la cuadrilla: ");
                             input = sc.nextInt();
-                            List<Olivar> olivares = olivarDao.findByCuadrilla(input);
+                            olivares = olivarDao.findByCuadrilla(input);
 
                             if (!olivares.isEmpty()) {
                                 System.out.println(olivares);
@@ -137,7 +165,7 @@ public class Main {
                             System.out.println("Introduce el ID del olivar: ");
                             input = sc.nextInt();
 
-                            List<Cuadrilla> cuadrillas = cuadrillaDao.findByOlivar(input);
+                            cuadrillas = cuadrillaDao.findByOlivar(input);
 
                             if (!cuadrillas.isEmpty()) {
                                 System.out.println(cuadrillas);
@@ -161,7 +189,7 @@ public class Main {
                         try {
                             System.out.println("Introduce el ID de la cuadrilla: ");
                             input = sc.nextInt();
-                            List<Almazara> almazaras = almazaraDao.findByCuadrilla(input);
+                            almazaras = almazaraDao.findByCuadrilla(input);
 
                             if (!almazaras.isEmpty()) {
                                 System.out.println(almazaras);
@@ -389,8 +417,69 @@ public class Main {
                     }
                     break;
 
-                //Salir
                 case "10":
+                    almazaras = almazaraDao.findAll();
+                    cuadrillas = cuadrillaDao.findAll();
+                    olivares = olivarDao.findAll();
+                    producciones = produccionDao.findAll();
+                    trabajadores = trabajadorDao.findAll();
+
+                    Aceituna aceituna = new Aceituna(almazaras, cuadrillas, olivares, trabajadores, producciones);
+                    saveXML(aceituna);
+                    break;
+
+                case "11":
+                    loadXml("aceituna.xml");
+                    break;
+
+                case "12":
+                    almazaras = almazaraDao.findAll();
+                    cuadrillas = cuadrillaDao.findAll();
+                    olivares = olivarDao.findAll();
+                    producciones = produccionDao.findAll();
+                    trabajadores = trabajadorDao.findAll();
+
+                    Aceituna aceitunaJSON = new Aceituna(almazaras, cuadrillas, olivares, trabajadores, producciones);
+                    saveJSON(aceitunaJSON);
+                    break;
+
+                case "13":
+                    loadGson("aceituna.json");
+                    break;
+
+                //Salir
+                case "14":
+                    System.out.println("Introduce el id de la cuadrilla para la que quieres añadir una produccion");
+                    int idC = sc.nextInt();
+
+                    System.out.println("Introduce el id de la almazara");
+                    int idA = sc.nextInt();
+
+                    System.out.println("Introduce el id del olivar: ");
+                    int idO = sc.nextInt();
+
+                    sc.nextLine(); // Limpiar el buffer
+
+                    try{
+                        System.out.println("Introduce la fecha para la produccion: (aaaa-mm-dd)");
+                        LocalDate fech =  LocalDate.parse(sc.nextLine());
+
+                        System.out.println("Introduce la cantidad recolectada: ");
+                        double cantidad = sc.nextDouble();
+
+                        Produccion produccion = new Produccion(idC, idO, idA, fech, cantidad);
+                        produccionDao.save(produccion);
+                        System.out.println("Producción creada correctamente");
+                        sc.nextLine();
+
+                    } catch (DateTimeParseException e ){
+                        System.err.println("Introduce la fecha en un formato válido");
+                    } catch (DaoException e){
+                        System.err.println(e.getMessage());
+                    }
+                    break;
+
+                case"15":
                     System.out.println("Saliendo del programa...");
                     break;
 
@@ -399,7 +488,7 @@ public class Main {
                     break;
             }
 
-        } while (!opcion.equals("10"));
+        } while (!opcion.equals("15"));
 
     }
 
@@ -407,6 +496,8 @@ public class Main {
      * Método que crea datos ficticios para la base de datos
      */
     private static void cargarDatos() {
+        // Crear el trigger
+
         // Inicializar DAOs
         TrabajadorDaoImpl trabajadorDao = new TrabajadorDaoImpl();
         CuadrillaDaoImpl cuadrillaDao = new CuadrillaDaoImpl();
@@ -442,7 +533,7 @@ public class Main {
 
         // Crear y guardar 5 cuadrillas, asignando un supervisor
         List<Cuadrilla> cuadrillas = new ArrayList<>();
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i < 5; i++) {
             Cuadrilla cuadrilla = new Cuadrilla("Cuadrilla " + i, supervisores.get(i).getId());
             cuadrillaDao.save(cuadrilla);
             cuadrillas.add(cuadrilla);
@@ -498,6 +589,10 @@ public class Main {
             Produccion produccion = new Produccion(cuadrilla.getId(), olivar.getId(), almazara.getId(), fecha, cantidadRecolectada);
             produccionDao.save(produccion);
         }
+
+        // Creación del trigger
+        Connection connection = FactoriaConexion.getConnection();
+        createTriggers(connection);
 
         System.out.println("Datos de prueba generados exitosamente.");
     }

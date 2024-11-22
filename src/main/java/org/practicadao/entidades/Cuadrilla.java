@@ -1,13 +1,24 @@
 package org.practicadao.entidades;
 
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Cuadrilla {
     // Atributos
+    @XmlAttribute(name = "id")
     private int id;
+
+    @XmlElement(name = "nombre")
     private String nombre;
+
+    @XmlElement(name = "supervisor_id")
     private int supervisor_id;
+
+    @XmlTransient()
     private List<Trabajador> trabajadores;
+
+    @XmlTransient()
     private List<Olivar> olivares;
 
     // Constructores

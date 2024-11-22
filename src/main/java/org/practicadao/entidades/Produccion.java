@@ -1,14 +1,31 @@
 package org.practicadao.entidades;
 
+import org.practicadao.marshalling.LocalDateAdapterXML;
+
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Produccion {
     // Atributos
+    @XmlAttribute(name = "id")
     private int id;
+
+    @XmlElement(name = "cuadrillas_id")
     private int cuadrilla_id;
+
+    @XmlElement(name = "olivar_id")
     private int olivar_id;
+
+    @XmlElement(name = "almazara_id")
     private int almazara_id;
+
+    @XmlElement(name = "fecha")
+    @XmlJavaTypeAdapter(LocalDateAdapterXML.class)
     private LocalDate fecha;
+
+    @XmlElement(name = "cantidad_recolectada")
     private double cantidadRecolectada;
 
     // Constructores

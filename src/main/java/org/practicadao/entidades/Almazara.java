@@ -1,10 +1,23 @@
 package org.practicadao.entidades;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Almazara {
     // Atributos
+    @XmlAttribute(name = "id")
     private int id;
+
+    @XmlElement(name = "nombre")
     private String nombre;
+
+    @XmlElement(name = "ubicacion")
     private String ubicacion;
+
+    @XmlElement(name = "capacidad")
     private double capacidad;
 
     // Constructores

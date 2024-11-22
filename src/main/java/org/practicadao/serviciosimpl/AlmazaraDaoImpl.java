@@ -100,7 +100,7 @@ public class AlmazaraDaoImpl implements AlmazaraDao {
             }
 
         } catch (SQLException e) {
-            throw new DaoException("Error al obtener todos los clientes.", e);
+            throw new DaoException("Error al obtener todos las almazaras.", e);
         }
         return almazaras;
     }
